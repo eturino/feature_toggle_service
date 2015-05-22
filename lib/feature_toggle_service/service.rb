@@ -4,14 +4,6 @@ module FeatureToggleService
     FALSE_VALUES = [:false, 'false', false, 0]
     TRUE_VALUES  = [:true, 'true', true, 1]
 
-    # Delegation of static methods to the Singleton instance
-    class << self
-      delegate :on?, :off?, :config_params, :config_params=,
-               :override_on, :override_off, :unset_override, :clear_overrides,
-               :default_on, :default_off, :unset_default, :clear_defaults,
-               to: :instance
-    end
-
     # Instance
     def config_params
       @config_params ||= { enabled: true, app_name: 'Default App', etcd_client: { port: 4001 } }
