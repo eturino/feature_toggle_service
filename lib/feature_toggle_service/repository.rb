@@ -59,7 +59,7 @@ module FeatureToggleService
       default_value_for(key)
     rescue Errno::ECONNREFUSED => e
       logger.error { "Cannot connect with Feature Toggle Repository! #{key.inspect}, final key #{fk.inspect}." }
-      Airbrake.notify(e)
+      Airbrake.notify(e) if defined?(Airbrake)
       default_value_for(key)
     end
 

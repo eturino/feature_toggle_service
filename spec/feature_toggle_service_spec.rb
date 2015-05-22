@@ -1,5 +1,16 @@
 require 'spec_helper'
 
+# mock airbrake
+class Airbrake
+  def self.notified
+    @e
+  end
+
+  def self.notify(e)
+    @e = e
+  end
+end
+
 describe FeatureToggleService do
   it 'has a version number' do
     expect(FeatureToggleService::VERSION).not_to be nil
@@ -68,6 +79,22 @@ describe FeatureToggleService do
   end
 
   describe '.on?' do
+    context 'etcd is down' do
+      let(:etcd_exception) { Errno::ECONNREFUSED.new }
+      before(:each) do
+        stub_request(:get, etcd_complete_path).to_raise(etcd_exception)
+      end
+
+      it do
+        expect(FeatureToggleService.on? key).to be_falsey
+      end
+
+      it 'Airbrake is notified if defined' do
+        expect(FeatureToggleService.on? key).to be_falsey
+        expect(Airbrake.notified).to eq(etcd_exception)
+      end
+    end
+
     context 'true in etcd' do
       let(:value) { true }
       before(:each) do

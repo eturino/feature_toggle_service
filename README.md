@@ -9,6 +9,8 @@ A client for Feature Toggles. It uses [hobknob](https://github.com/opentable/hob
 
 It also supports overrides and defaults.
 
+note: if Airbrake is defined and etcd is not reachable, it `Airbrake.notify(exception)` will be called, where `exception` is the `Errno::ECONNREFUSED` error.
+
 ## Basic use
 
 We use `on?` and `off?` methods, to check if a feature is enabled or disabled in hobknob. We use a simple String or Symbol as the key. It performs a `to_s` to the key so using `:feature` or `'feature'` is the same.
@@ -42,6 +44,7 @@ A default is set to ON with `FeatureToggleService.default_on(key)`, and to OFF w
  
 We can remove a default with `FeatureToggleService.unset_default(key)`, or all of hem with `FeatureToggleService.clear_default`.
 
+The default value will be returned if the key is not found in hobknob, or if etcd does not respond.
 
 ## Config parameters
 
