@@ -13,6 +13,8 @@ require 'feature_toggle_service'
 require 'webmock/rspec'
 require 'naught'
 
+WebMock.disable_net_connect!(:allow => "codeclimate.com")
+
 RSpec.configure do |config|
   # some (optional) config here
 end
