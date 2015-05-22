@@ -26,22 +26,26 @@ module FeatureToggleService
     delegate :unset_override, :clear_overrides, :unset_default, :clear_defaults, to: :repository
 
     # check if ETCD is enabled or not
-    delegate :enabled?, to: :config
+    delegate :enabled?, :logger, to: :config
 
     # helper methods
     def default_on(key)
+      logger.info "FeaturedToggleService: default ON for key: #{key}"
       repository.set_default key, true
     end
 
     def default_off(key)
+      logger.info "FeaturedToggleService: default OFF for key: #{key}"
       repository.set_default key, false
     end
 
     def override_on(key)
+      logger.info "FeaturedToggleService: override ON for key: #{key}"
       repository.set_override key, true
     end
 
     def override_off(key)
+      logger.info "FeaturedToggleService: override OFF for key: #{key}"
       repository.set_override key, false
     end
 
