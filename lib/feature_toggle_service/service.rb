@@ -25,6 +25,9 @@ module FeatureToggleService
     # FOR TESTS, DEFAULTS and OVERRIDES
     delegate :unset_override, :clear_overrides, :unset_default, :clear_defaults, to: :repository
 
+    # check if ETCD is enabled or not
+    delegate :enabled?, to: :config
+
     # helper methods
     def default_on(key)
       repository.set_default key, true

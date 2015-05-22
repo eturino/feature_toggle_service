@@ -12,6 +12,7 @@ module FeatureToggleService
     delegate :on?, :off?, :config_params, :config_params=,
              :override_on, :override_off, :unset_override, :clear_overrides,
              :default_on, :default_off, :unset_default, :clear_defaults,
+             :enabled?,
              to: :service
   end
 

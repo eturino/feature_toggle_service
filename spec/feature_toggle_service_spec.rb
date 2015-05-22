@@ -40,11 +40,31 @@ describe FeatureToggleService do
     FeatureToggleService.config_params[:enabled]            = config_enabled
     FeatureToggleService.config_params[:app_name]           = app_name
     FeatureToggleService.config_params[:etcd_client][:port] = etcd_client_port
-    FeatureToggleService.config_params[:logger]             = logger
+    FeatureToggleService.config_params[:logger_level]       = Logger::INFO
     FeatureToggleService.config_params[:key_suffix]         = key_suffix
 
     FeatureToggleService.clear_overrides
     FeatureToggleService.clear_defaults
+  end
+
+  describe '.enabled?' do
+
+    context 'with etcd disabled' do
+      let(:config_enabled) { false }
+
+      it do
+        expect(FeatureToggleService.enabled?).to be_falsey
+      end
+    end
+
+
+    context 'with etcd enabled' do
+      let(:config_enabled) { true }
+
+      it do
+        expect(FeatureToggleService.enabled?).to be_truthy
+      end
+    end
   end
 
   describe '.on?' do
@@ -57,6 +77,14 @@ describe FeatureToggleService do
       context 'alone' do
         it do
           expect(FeatureToggleService.on? key).to be_truthy
+        end
+      end
+
+      context 'with etcd disabled' do
+        let(:config_enabled) { false }
+
+        it do
+          expect(FeatureToggleService.on? key).to be_falsey
         end
       end
 
