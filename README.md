@@ -1,8 +1,11 @@
 # FeatureToggleService
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/feature_toggle_service`. To experiment with that code, run `bin/console` for an interactive prompt.
+[![Gem Version](https://badge.fury.io/rb/feature_toggle_service.svg)](http://badge.fury.io/rb/feature_toggle_service)
+[![Build Status](https://travis-ci.org/eturino/feature_toggle_service.svg?branch=master)](https://travis-ci.org/eturino/feature_toggle_service)
+[![Code Climate](https://codeclimate.com/github/eturino/feature_toggle_service/badges/gpa.svg)](https://codeclimate.com/github/eturino/feature_toggle_service)
+[![Test Coverage](https://codeclimate.com/github/eturino/feature_toggle_service/badges/coverage.svg)](https://codeclimate.com/github/eturino/feature_toggle_service/coverage)
 
-TODO: Delete this and the text above, and describe your gem
+TODO: describe gem
 
 ## Installation
 
