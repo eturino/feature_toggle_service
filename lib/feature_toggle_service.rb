@@ -16,7 +16,11 @@ module FeatureToggleService
   end
 
   def self.service
-    @service ||= Service.new
+    @service ||= reload_service
+  end
+
+  def self.reload_service
+    @service = Service.new
   end
 
 end

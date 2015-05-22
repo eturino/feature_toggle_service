@@ -10,6 +10,9 @@ CodeClimate::TestReporter.start
 require 'pry'
 require 'feature_toggle_service'
 
+require 'webmock/rspec'
+require 'naught'
+
 RSpec.configure do |config|
   # some (optional) config here
 end

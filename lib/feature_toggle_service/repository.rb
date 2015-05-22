@@ -42,23 +42,29 @@ module FeatureToggleService
       @defaults.clear
     end
 
-    private
-    def load_value(key)
-      return default_value_for(key) unless config.enabled?
+    delegate :key_suffix, :enabled?, :app_name, to: :config
 
+    private
+    delegate :logger, to: :config
+
+    def load_value(key)
+      enabled? ? retrieve_value(key) : default_value_for(key)
+    end
+
+    def retrieve_value(key)
       fk = final_key(key)
       etcd_client.get(fk).value
     rescue Etcd::KeyNotFound => e
-      Rails.logger.error "Feature Toggle without key #{key.inspect}, final key #{fk.inspect}."
+      logger.error { "Feature Toggle without key #{key.inspect}, final key #{fk.inspect}." }
       default_value_for(key)
     rescue Errno::ECONNREFUSED => e
-      Rails.logger.error "Cannot connect with Feature Toggle Repository! #{key.inspect}, final key #{fk.inspect}."
+      logger.error { "Cannot connect with Feature Toggle Repository! #{key.inspect}, final key #{fk.inspect}." }
       Airbrake.notify(e)
       default_value_for(key)
     end
 
     def final_key(key)
-      "/v1/toggles/#{config.app_name}/#{key}/#{Rails.env}"
+      "/v1/toggles/#{app_name}/#{key}/#{key_suffix}"
     end
 
     def etcd_client
