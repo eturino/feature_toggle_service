@@ -41,6 +41,8 @@ describe FeatureToggleService do
     ETCD
   end
 
+  let(:cache_toggles) { false }
+
   before(:each) do
     # Etcd::Log.level = Logger::INFO
 
@@ -49,6 +51,7 @@ describe FeatureToggleService do
     FeatureToggleService.reload_service
 
     FeatureToggleService.config_params[:enabled]            = config_enabled
+    FeatureToggleService.config_params[:cache_toggles]      = cache_toggles
     FeatureToggleService.config_params[:app_name]           = app_name
     FeatureToggleService.config_params[:etcd_client][:port] = etcd_client_port
     FeatureToggleService.config_params[:logger_level]       = Logger::INFO
@@ -97,13 +100,37 @@ describe FeatureToggleService do
 
     context 'true in etcd' do
       let(:value) { true }
+      let(:etcd_mocked_request) { stub_request(:get, etcd_complete_path).to_return(body: etcd_body_200) }
+
       before(:each) do
-        stub_request(:get, etcd_complete_path).to_return(body: etcd_body_200)
+        etcd_mocked_request
       end
 
       context 'alone' do
         it do
           expect(FeatureToggleService.on? key).to be_truthy
+        end
+      end
+
+      context 'with cache enabled' do
+        let(:cache_toggles) { true }
+        it 'calls every time' do
+          3.times do
+            expect(FeatureToggleService.on? key).to be_truthy
+          end
+
+          assert_request_requested etcd_mocked_request, at_most_times: 1, at_least_times: 1
+        end
+      end
+
+      context 'without cache enabled' do
+        let(:cache_toggles) { false }
+        it 'calls every time' do
+          3.times do
+            expect(FeatureToggleService.on? key).to be_truthy
+          end
+
+          assert_request_requested etcd_mocked_request, at_most_times: 3, at_least_times: 3
         end
       end
 

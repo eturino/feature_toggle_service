@@ -46,16 +46,23 @@ We can remove a default with `FeatureToggleService.unset_default(key)`, or all o
 
 The default value will be returned if the key is not found in hobknob, or if etcd does not respond.
 
+## Cached Toggles
+
+If enabled in the config params (see "Config parameters" section bellow), a given toggle will be loaded only once, and its value will be stored in the FeatureToggleService in a hash.
+
+The caching takes place around the actual call to `etcd` so it's the only part that is cached. It's only cached if it is successful (true or false), so if etcd is off or if the key is not found it will keep checking etcd every time. 
+
 ## Config parameters
 
 We can set parameters for config.
 
 * `app_name`: required. It's the App name in hobknob.
+* `cache_toggles`: if true, the toggles will be looked up only once (see "Cached Toggles" section). It's a boolean. Defaults to `false`
 * `logger`: logger to be used in the client. Defaults to `nil`
 * `logger_level`: if no `logger` is passed, then a new `Logger` will be created to `STDOUT` and this level will be used. Defaults to `nil` 
 * `key_suffix`: a suffix on the key, used as the discriminator in hobknob. Can be the environment, or the domain...  Defaults to `nil`
 * `enabled`: if false, then etcd calls are skipped, and only overrides and defaults are used. Defaults to `true`
-* `etcd_client`: parameters for the etcd client. It's a hash. Defaults to `{ port: 4001 }`
+* `etcd_client`: parameters for the etcd client. It's a hash. Defaults to `{ port: 4001, host: 'localhost' }`
 
 *important: The config has to be set before using the service*
 

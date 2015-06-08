@@ -7,6 +7,7 @@ module FeatureToggleService
     def initialize(config)
       @config    = config
       @overrides = {}
+      @cached    = {}
       @defaults  = {}
     end
 
@@ -45,7 +46,7 @@ module FeatureToggleService
     delegate :key_suffix, :enabled?, :app_name, to: :config
 
     private
-    delegate :logger, to: :config
+    delegate :logger, :cache_toggles?, to: :config
 
     def load_value(key)
       enabled? ? retrieve_value(key) : default_value_for(key)
@@ -53,7 +54,7 @@ module FeatureToggleService
 
     def retrieve_value(key)
       fk = final_key(key)
-      etcd_client.get(fk).value
+      etcd_get_toggle(fk)
     rescue Etcd::KeyNotFound => e
       logger.error { "Feature Toggle without key #{key.inspect}, final key #{fk.inspect}." }
       default_value_for(key)
@@ -61,6 +62,18 @@ module FeatureToggleService
       logger.error { "Cannot connect with Feature Toggle Repository! #{key.inspect}, final key #{fk.inspect}." }
       Airbrake.notify(e) if defined?(Airbrake)
       default_value_for(key)
+    end
+
+    def etcd_get_toggle(fk)
+      etcd_load_toggle(fk) unless cache_toggles?
+
+      @cached.fetch(fk) do
+        @cached[fk] = etcd_load_toggle(fk)
+      end
+    end
+
+    def etcd_load_toggle(fk)
+      etcd_client.get(fk).value
     end
 
     def final_key(key)

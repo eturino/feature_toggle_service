@@ -6,7 +6,7 @@ module FeatureToggleService
 
     # Instance
     def config_params
-      @config_params ||= { key_suffix: 'suffix', enabled: true, app_name: 'Default App', etcd_client: { port: 4001 } }
+      @config_params ||= { key_suffix: 'suffix', enabled: true, cache_toggles: false, app_name: 'Default App', etcd_client: { port: 4001 } }
     end
 
     def off?(key)
