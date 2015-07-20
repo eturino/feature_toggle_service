@@ -112,21 +112,95 @@ Or install it yourself as:
 
 ### Setup
 
-Example of configuration in an Rails initializer, using SimpleConfig. We're setting up some config params, and also enabling by default a feature `'my_feature'`
+Example of configuration in an Rails initializer. We're setting up some config params, and also enabling by default a feature `'my_feature'`
+
+
+First, we add common config to the Application config, like where do we have our etcd repository and how to access it.
 
 ```ruby
+# config/application.rb
+
+module MyCoolProject
+  class Application < Rails::Application
+
+    #... other stuff
+
+    # FEATURE TOGGLE
+    config.feature_toggle                       = ActiveSupport::OrderedOptions.new
+    config.feature_toggle.enabled               = true
+    config.feature_toggle.cache_toggles         = true
+    config.feature_toggle.app_name              = 'MyCoolProject'
+    config.feature_toggle.etcd_client           = ActiveSupport::OrderedOptions.new
+    config.feature_toggle.etcd_client.host      = 'etcd.example.org'
+    config.feature_toggle.etcd_client.port      = 443
+    config.feature_toggle.etcd_client.use_ssl   = true
+    config.feature_toggle.etcd_client.user_name = 'my-basic-auth-username'
+    config.feature_toggle.etcd_client.password  = 'my-basic-auth-password'
+  end
+end
+```
+
+Then we add environment keys, overrides and defaults on the env config
+
+```ruby
+# config/environments/mcp_int.rb
+
+MyCoolProject::Application.configure do
+
+  # FEATURED TOGGLES
+  config.feature_toggle.key_suffix   = 'int'
+  config.feature_toggle.default_on   = [:feature_1, :another_feature]
+  config.feature_toggle.default_off  = []
+  config.feature_toggle.override_on  = [:feature_3]
+  config.feature_toggle.override_off = []
+end
+
+```
+
+Finally, we load the config into `FeatureToggleService` in the initializer:
+
+```ruby
+# config/initializers/feature_toggles.rb
+
 require 'feature_toggle_service'
 
 # config
-FeatureToggleService.config_params[:enabled]            = SimpleConfig.for(:site).feature_toggle.enabled
-FeatureToggleService.config_params[:app_name]           = SimpleConfig.for(:site).feature_toggle.app_name
-FeatureToggleService.config_params[:etcd_client][:port] = SimpleConfig.for(:site).feature_toggle.etcd_client.port
-FeatureToggleService.config_params[:logger]             = Rails.logger
-FeatureToggleService.config_params[:key_suffix]         = Rails.env
+ftc = Rails.configuration.feature_toggle
+cp  = FeatureToggleService.config_params
+
+cp[:logger]        = Rails.logger
+cp[:cache_toggles] = ftc.cache_toggles unless ftc.cache_toggles.nil?
+cp[:enabled]       = ftc.enabled unless ftc.enabled.nil?
+cp[:app_name]      = ftc.app_name unless ftc.app_name.nil?
+cp[:key_suffix]    = ftc.key_suffix unless ftc.key_suffix.nil?
+
+etcd_cnf = ftc.etcd_client
+if etcd_cnf
+  cp[:etcd_client][:host]      = etcd_cnf.host unless etcd_cnf.host.nil?
+  cp[:etcd_client][:port]      = etcd_cnf.port unless etcd_cnf.port.nil?
+  cp[:etcd_client][:use_ssl]   = etcd_cnf.use_ssl unless etcd_cnf.use_ssl.nil?
+  cp[:etcd_client][:user_name] = etcd_cnf.user_name unless etcd_cnf.user_name.nil?
+  cp[:etcd_client][:password]  = etcd_cnf.password unless etcd_cnf.password.nil?
+end
 
 # specific defaults on this project
-FeatureToggleService.default_on :my_feature
+Array(ftc.default_on).each do |key|
+  FeatureToggleService.default_on key
+end
+
+Array(ftc.default_off).each do |key|
+  FeatureToggleService.default_off key
+end
+
+Array(ftc.override_on).each do |key|
+  FeatureToggleService.override_on key
+end
+
+Array(ftc.override_off).each do |key|
+  FeatureToggleService.override_off key
+end
 ```
+
 
 ## Development
 
