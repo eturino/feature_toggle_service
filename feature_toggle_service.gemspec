@@ -23,9 +23,9 @@ Gem::Specification.new do |spec|
   # end
 
   spec.add_dependency 'etcd'
-  spec.add_dependency 'activesupport', '~> 4'
-  spec.add_development_dependency 'bundler', '~> 1.9'
-  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_dependency 'activesupport', '~> 5'
+  spec.add_development_dependency 'bundler', '~> 2'
+  spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rspec-nc'
   spec.add_development_dependency 'pry'
