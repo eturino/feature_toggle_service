@@ -4,16 +4,13 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'bundler/setup'
 Bundler.setup
 
-require 'codeclimate-test-reporter'
-CodeClimate::TestReporter.start
-
 require 'pry'
 require 'feature_toggle_service'
 
 require 'webmock/rspec'
 require 'naught'
 
-WebMock.disable_net_connect!(:allow => "codeclimate.com")
+WebMock.disable_net_connect!
 
 RSpec.configure do |config|
   # some (optional) config here

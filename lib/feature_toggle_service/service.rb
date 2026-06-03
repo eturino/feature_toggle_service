@@ -50,7 +50,7 @@ module FeatureToggleService
     end
 
     def config
-      @config ||= Config.new config_params
+      @config ||= Config.new(**config_params)
     end
 
     private
