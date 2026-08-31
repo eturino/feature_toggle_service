@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   # end
 
   spec.add_dependency 'etcd'
-  spec.add_dependency 'activesupport', '~> 5'
+  spec.add_dependency 'activesupport', '>= 5', '< 9'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rspec-nc'
